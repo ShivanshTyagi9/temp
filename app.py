@@ -18,7 +18,6 @@ client = genai.Client(api_key=api_key)
 def download_audio_mp3(youtube_url: str, output_dir: str) -> str:
     """Download audio directly as WAV using yt-dlp."""
     ydl_opts = {
-        'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
         'format': 'bestaudio/best',
         'quiet': False, 
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
