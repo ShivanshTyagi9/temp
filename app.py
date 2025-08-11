@@ -1,17 +1,11 @@
 import os
 import tempfile
 import yt_dlp
-from fastapi import FastAPI, Form
-from fastapi.responses import JSONResponse
-from dotenv import load_dotenv
+from flask import Flask, request, jsonify
 from google import genai
 from google.genai import types
 
-# Load environment variables
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-app = FastAPI(title="YouTube Audio Transcriber (Gemini 2.5 Flash Test)")
+app = Flask(__name__)
 
 def download_audio_wav(youtube_url: str, output_dir: str) -> str:
     """Download audio directly as WAV using yt-dlp."""
@@ -30,35 +24,44 @@ def download_audio_wav(youtube_url: str, output_dir: str) -> str:
         title = info.get('title', 'audio')
         return os.path.join(output_dir, f"{title}.wav")
 
-@app.post("/transcribe")
-def transcribe_youtube(youtube_url: str = Form(...)):
-    """Download audio from YouTube and transcribe using Gemini 2.5 Flash."""
+@app.route("/transcribe", methods=["POST"])
+def transcribe_youtube():
+    youtube_url = request.form.get("youtube_url")
+    if not youtube_url:
+        return jsonify({"error": "Missing YouTube URL"}), 400
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return jsonify({"error": "Missing GEMINI_API_KEY"}), 500
+
+    client = genai.Client(api_key=api_key)
+
     try:
         with tempfile.TemporaryDirectory() as temp_dir:
-            # Step 1: Download audio directly as .wav
             audio_path = download_audio_wav(youtube_url, temp_dir)
             if not os.path.exists(audio_path):
-                return JSONResponse(content={"error": "Audio download failed"}, status_code=500)
+                return jsonify({"error": "Audio download failed"}), 500
 
-            # Step 2: Read audio bytes
             with open(audio_path, 'rb') as f:
                 audio_bytes = f.read()
 
-            # Step 3: Transcribe with Gemini 2.5 Flash
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=[
-                    'Transcrive this audio clip exactly as it is',
+                    'Transcribe this audio clip exactly as it is',
                     types.Part.from_bytes(
-                    data=audio_bytes,
-                    mime_type='audio/wav',
+                        data=audio_bytes,
+                        mime_type='audio/wav',
                     )
                 ]
             )
 
             transcript = response.text.strip()
-
-            return {"youtube_url": youtube_url, "transcript": transcript}
+            return jsonify({"youtube_url": youtube_url, "transcript": transcript})
 
     except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 7860))
+    app.run(host="0.0.0.0", port=port)
