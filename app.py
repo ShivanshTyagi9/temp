@@ -10,14 +10,15 @@ app = Flask(__name__)
 def download_audio_wav(youtube_url: str, output_dir: str) -> str:
     """Download audio directly as WAV using yt-dlp."""
     ydl_opts = {
-        'format': 'bestaudio[ext=m4a]',
+        'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
+        'format': 'bestaudio/best',  # Limit to 720p for speed
+        'quiet': False, 
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
             'preferredquality': '64',
-        }],
-        'quiet': True,
+        }]
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(youtube_url, download=True)
