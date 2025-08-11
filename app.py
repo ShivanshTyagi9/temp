@@ -118,7 +118,7 @@ Answer: A
 """
 
     try:
-        model = genai.GenerativeModel(model_name="gemini-2.0-flash")
+        #model = genai.GenerativeModel(model_name="gemini-2.0-flash")
         response = client.models.generate_content(
             model='gemini-2.5-flash',
             contents = [prompt]
