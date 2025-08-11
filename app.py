@@ -9,7 +9,7 @@ from google.genai import types
 
 # Load environment variables
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 app = FastAPI(title="YouTube Audio Transcriber (Gemini 2.5 Flash Test)")
 
@@ -45,11 +45,16 @@ def transcribe_youtube(youtube_url: str = Form(...)):
                 audio_bytes = f.read()
 
             # Step 3: Transcribe with Gemini 2.5 Flash
-            model = genai.GenerativeModel("gemini-2.5-flash")
-            response = model.generate_content([
-                "Transcribe this audio clip exactly as it is",
-                types.Part.from_bytes(data=audio_bytes, mime_type="audio/wav")
-            ])
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=[
+                    'Transcrive this audio clip exactly as it is',
+                    types.Part.from_bytes(
+                    data=audio_bytes,
+                    mime_type='audio/wav',
+                    )
+                ]
+            )
 
             transcript = response.text.strip()
 
