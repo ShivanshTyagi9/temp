@@ -48,7 +48,7 @@ def transcribe_youtube():
                     'Transcribe this audio clip exactly as it is',
                     types.Part.from_bytes(
                         data=audio_bytes,
-                        mime_type='audio/m4a',
+                        mime_type='audio/acc',
                     )
                 ]
             )
