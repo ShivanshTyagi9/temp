@@ -5,15 +5,11 @@ from flask import Flask, request, jsonify
 from google import genai
 from google.genai import types
 import traceback
-import sys
 
 app = Flask(__name__)
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
-    print("Error: Missing GEMINI_API_KEY environment variable.")
-    sys.exit(1)  # Exit the server if API key is not set
-
-client = genai.Client(api_key=api_key)
+    print("Error: Missing GEMINI_API_KEY environment variable.")  # Exit the server if API key is not set
 
 client = genai.Client(api_key=api_key)
 # -------------------
