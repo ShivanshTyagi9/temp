@@ -13,6 +13,9 @@ def download_audio_wav(youtube_url: str, output_dir: str) -> str:
         'format': 'bestaudio[ext=m4a]',
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
         'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '64',
         }],
         'quiet': True,
     }
@@ -48,7 +51,7 @@ def transcribe_youtube():
                     'Transcribe this audio clip exactly as it is',
                     types.Part.from_bytes(
                         data=audio_bytes,
-                        mime_type='audio/acc',
+                        mime_type='audio/mp3',
                     )
                 ]
             )
