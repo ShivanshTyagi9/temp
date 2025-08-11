@@ -4,8 +4,8 @@ import yt_dlp
 from fastapi import FastAPI, Form
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
-import google.generativeai as genai
-from google.generativeai import types
+from google import genai
+from google.genai import types
 
 # Load environment variables
 load_dotenv()
