@@ -23,7 +23,7 @@ def download_audio_wav(youtube_url: str, output_dir: str) -> str:
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(youtube_url, download=True)
         title = info.get('title', 'audio')
-        return os.path.join(output_dir, f"{title}.wav")
+        return os.path.join(output_dir, f"{title}.mp3")
 
 @app.route("/transcribe", methods=["POST"])
 def transcribe_youtube():
